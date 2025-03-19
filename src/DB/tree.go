@@ -1,20 +1,40 @@
 package db
 
-// node []byte format
-// node[0:2] = type
-// node[2:4] = number of keys
-// node[4:(numKeys * 8)] = pointers
-// node[:(numKeys * 2)] = offset
-// after offset is the KVs of the data
+import "encoding/binary"
 
-//KV format
-// n[0:2] key length
-// n[2:4] value length
-// n[4:(key length)] key
-// n[klen: (value length)] value
+// Branch format
+// node[0:2] Number of Kids
+// node[2:] Pointers to kids
 
-type Node []byte
+// Leaf format
+// node[0:2] Number Of Keys
+// node[2: 2 *NKeys] Offset
+// node[:] Key / Values
 
-func init() {
+type Leaf []byte
 
+type Branch []byte
+
+func NewLeaf() Leaf {
+	return Leaf{}
+}
+
+func NewBranch() Branch {
+	return Branch{}
+}
+
+func (L Leaf) GetNKeys() uint16 {
+	return binary.LittleEndian.Uint16(L[0:2])
+}
+
+func (B Branch) GetNChildren() uint16 {
+	return binary.LittleEndian.Uint16(B[0:2])
+}
+
+func (L Leaf) AddNewKey() {
+	binary.LittleEndian.PutUint16(L, (L.GetNKeys() + 1))
+}
+
+func (L Leaf) GetKey() []byte {
+	return
 }
